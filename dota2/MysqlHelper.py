@@ -41,7 +41,7 @@ except Exception, e:
 if isSae:
   global_engine = create_engine('mysql://%s:%s@%s:%d/%s?charset=utf8' % (sae.const.MYSQL_USER,sae.const.MYSQL_PASS,sae.const.MYSQL_HOST,3307,sae.const.MYSQL_DB) , encoding='utf8', pool_recycle=10 )
 else:
-  global_engine = create_engine('mysql+pymysql://root:asdfghjkl@192.168.1.20/dota2?charset=utf8',echo=False)
+  global_engine = create_engine('mysql+pymysql://root:asdfghjkl@127.0.0.1/dota2?charset=utf8',echo=False)
 BaseModel = declarative_base()
 DB_Session = sessionmaker(bind=global_engine)
 global_session = DB_Session()
@@ -55,16 +55,16 @@ class DotaMatchModel(BaseModel):
     
     match_seq_num           = Column(BIGINT(20,unsigned=True))
     
-    player0                 = Column(String(512))
-    player1                 = Column(String(512))
-    player2                 = Column(String(512))
-    player3                 = Column(String(512))
-    player4                 = Column(String(512))
-    player5                 = Column(String(512))
-    player6                 = Column(String(512))
-    player7                 = Column(String(512))
-    player8                 = Column(String(512))
-    player9                 = Column(String(512))
+    player0                 = Column(String(2048))
+    player1                 = Column(String(2048))
+    player2                 = Column(String(2048))
+    player3                 = Column(String(2048))
+    player4                 = Column(String(2048))
+    player5                 = Column(String(2048))
+    player6                 = Column(String(2048))
+    player7                 = Column(String(2048))
+    player8                 = Column(String(2048))
+    player9                 = Column(String(2048))
 
     radiant_win             = Column(TINYINT(4,unsigned=True))
     

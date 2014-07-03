@@ -1,9 +1,8 @@
-import urllib
+import urllib2
 import json
-# import dota2
 from dota2Error import Dota2APIError
-# from Match import *
-
+import time
+import random
 
 api_key = 'F14F6FD0544C5151E2E0C7094672A746'
 test_api = False
@@ -23,22 +22,36 @@ class APIConnection:
             
         self.api_key = api_key
         
-        self.match_history_url = 'https://api.steampowered.com/IDOTA2Match_'+apiID+'/GetMatchHistory/V001/?key='+self.api_key
-        self.match_detail_url= 'https://api.steampowered.com/IDOTA2Match_'+apiID+'/GetMatchDetails/V001/?key='+self.api_key
+        self.match_history_url = 'http://api.steampowered.com/IDOTA2Match_'+apiID+'/GetMatchHistory/V001/?key='+self.api_key
+        self.match_detail_url= 'http://api.steampowered.com/IDOTA2Match_'+apiID+'/GetMatchDetails/V001/?key='+self.api_key
 
-        self.match_by_seq_num_url= 'https://api.steampowered.com/IDOTA2Match_'+apiID+'/GetMatchHistoryBySequenceNum/V001/?key='+self.api_key
+        self.match_by_seq_num_url= 'http://api.steampowered.com/IDOTA2Match_'+apiID+'/GetMatchHistoryBySequenceNum/V001/?key='+self.api_key
 
 
     def _getData(self, url):
         try:
-            data =  json.load(urllib.urlopen(url))
+            time.sleep(random.random())
+            response = urllib2.urlopen(url)
+            data =  json.load(response)
             return data
-        except IOError as e: 
-            print e
-            if e.args[1] == 401:
+        except urllib2.HTTPError as e: 
+            print e.code
+            if e.code == 401:
                 raise Dota2APIError('Invalid API key')
-            else:
-                raise e
+            if e.code == 500:
+                time.sleep(2)
+                return self._getData(url)
+            time.sleep(0.5)
+            return self._getData(url)
+        except IOError,e:
+            print e.args
+            time.sleep(0.5)
+            return self._getData(url)
+        except Exception,e:
+            print e.args
+            print response
+            time.sleep(0.5)
+            return self._getData(url)
 
     def searchMatch(self, player_name=None, hero_id=None, game_mode=None, skill=None, date_min=None, 
             date_max=None, min_players=None, account_id=None, leauge_id=None, start_at_match_id=None,
