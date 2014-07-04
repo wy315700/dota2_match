@@ -35,7 +35,6 @@ class APIConnection:
             data =  json.load(response)
             return data
         except urllib2.HTTPError as e: 
-            print e.code
             if e.code == 401:
                 raise Dota2APIError('Invalid API key')
             if e.code == 500:

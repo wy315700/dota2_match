@@ -13,19 +13,27 @@ handle = MatchHandle()
 api = APIConnection()
 
 process_num = 5
-base_num = 100000000 / process_num
+base_num = 1000000
+base_start_num = 200000000
+base_end_num  = 650000000
+max_process_num = (base_end_num - base_start_num) / base_num
 
-def fetch_history_by_seq_num(queue, start_seq_num, id):
+def fetch_history_by_seq_num(data_queue, start_seq_num, callback_queue):
+    max_seq_num = start_seq_num + base_num
     while True:
         matchs = api._getMatchBySeqNum(start_seq_num)
 
         for x in matchs:
-            queue.put(x)
+            while data_queue.full():
+                time.sleep(random.random())
+            
+            data_queue.put(x)
             start_seq_num = x['match_seq_num']
 
         start_seq_num += 1
 
-        if start_seq_num >= (id + 1) * base_num:
+        if start_seq_num >= max_seq_num:
+            callback_queue.put(1)
             break
 
 def saveToDB(queue):
@@ -77,14 +85,27 @@ if __name__ == '__main__':
     process_list = []
 
     q = Queue()
+    callback_queue = Queue()
+
 
     for i in xrange(0,process_num):
-        process_list.append(Process(target=fetch_history_by_seq_num,args=(q, base_num * i, i,)))
+        process_list.append(Process(target=fetch_history_by_seq_num,args=(q, base_start_num + base_num * i, callback_queue,)))
+
+    current_num = process_num
 
     process_list.append(Process(target=saveToDB,args=(q,)))
 
     for x in process_list:
         x.start()
+
+    result =  callback_queue.get()
+    while result == 1:
+        print current_num
+        if current_num >= max_process_num:
+            break
+        Process(target=fetch_history_by_seq_num,args=(q, base_start_num + base_num * current_num, callback_queue,)).start()
+        current_num += 1
+        result = callback_queue.get()
 
     for x in process_list:
         x.join()
