@@ -48,7 +48,6 @@ class APIConnection:
             return self._getData(url)
         except Exception,e:
             print e.args
-            print response
             time.sleep(0.5)
             return self._getData(url)
 

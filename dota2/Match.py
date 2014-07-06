@@ -9,12 +9,12 @@ import time
 import random
 
 start_seq_num = 0
-handle = MatchHandle()
+
 api = APIConnection()
 
 process_num = 5
 base_num = 1000000
-base_start_num = 200000000
+base_start_num = 600000000
 base_end_num  = 650000000
 max_process_num = (base_end_num - base_start_num) / base_num
 
@@ -25,6 +25,7 @@ def fetch_history_by_seq_num(data_queue, start_seq_num, callback_queue):
 
         for x in matchs:
             while data_queue.full():
+                print "queue is full"
                 time.sleep(random.random())
             
             data_queue.put(x)
@@ -39,6 +40,7 @@ def fetch_history_by_seq_num(data_queue, start_seq_num, callback_queue):
 def saveToDB(queue):
     while True:
         x = queue.get()
+        handle = MatchHandle()
         match = DotaMatchModel();   
         match.match_id            = x['match_id']   
         match.match_seq_num       = x['match_seq_num']

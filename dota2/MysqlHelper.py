@@ -6,7 +6,7 @@ __author__ = 'wangyang'
 #  Created by 汪 洋 on 14-1-25.
 #  Copyright (c) 2014年 helloword. All rights reserved.
 #
-import pymysql
+import MySQLdb
 
 import sqlalchemy
 from sqlalchemy import Column
@@ -41,12 +41,10 @@ except Exception, e:
 if isSae:
   global_engine = create_engine('mysql://%s:%s@%s:%d/%s?charset=utf8' % (sae.const.MYSQL_USER,sae.const.MYSQL_PASS,sae.const.MYSQL_HOST,3307,sae.const.MYSQL_DB) , encoding='utf8', pool_recycle=10 )
 else:
-  global_engine = create_engine('mysql+pymysql://root:asdfghjkl@127.0.0.1/dota2?charset=utf8',echo=False)
+  global_engine = create_engine('mysql://root:asdfghjkl@127.0.0.1/dota2?charset=utf8',echo=False)
 BaseModel = declarative_base()
 DB_Session = sessionmaker(bind=global_engine)
-global_session = DB_Session()
 
-global_user_id_to_baidu_map = {}
 
 class DotaMatchModel(BaseModel):
     __tablename__ = 'dota_match'
